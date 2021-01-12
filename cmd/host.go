@@ -16,20 +16,27 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
 	"errors"
+	"fmt"
 	"github.com/spf13/cobra"
 	"net/http"
+	"net/url"
 )
+
 var RedirectAttemptedError = errors.New("redirect")
 
 // hCmd represents the h command
 var hostCmd = &cobra.Command{
 	Use:   "host",
 	Short: "test with host name",
-	Long: `test with host name`,
+	Long:  `test with host name`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
+			return errors.New("Default argument is url(https://example.io)")
+		}
+		// is url vaild
+		u, err := url.Parse(args[0])
+		if err != nil || u.Scheme == "" || u.Host == "" {
 			return errors.New("Default argument is url(https://example.io)")
 		}
 		return nil
@@ -45,7 +52,6 @@ var hostCmd = &cobra.Command{
 		return nil
 	},
 }
-
 
 func init() {
 	rootCmd.AddCommand(hostCmd)
