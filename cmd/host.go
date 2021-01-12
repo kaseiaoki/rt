@@ -44,8 +44,12 @@ var hostCmd = &cobra.Command{
 		result,err := requestCheck.AllRedirectHeader(args[0])
 		if err != nil {
 			fmt.Println(err)
+			return nil
 		}
-		fmt.Println(result)
+		u := result
+		for i, _ := range u {
+			fmt.Printf("%d : %s\n", i, u[i])
+		}
 		return nil
 	},
 }
