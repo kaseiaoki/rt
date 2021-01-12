@@ -29,8 +29,9 @@ func AllRedirectHeader(target_url string) ([]string, error) {
 		if err != nil {
 			break
 		}
-		a = append(a, rp.URL.String())
-		a = append(a, string(dump))
+		
+		nameAndHeader := rp.URL.String() + "\n" + string(dump)
+		a = append(a, nameAndHeader)
 		r = rp.Response
 	}
 	return a, err
