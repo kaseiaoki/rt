@@ -2,10 +2,11 @@ package requestCheck
 
 import (
 	"net/http"
-    "reflect"
+	"net/http/httputil"
+	"reflect"
 )
 
-func AllRedirectHeader(target_url string) ([]string, error){
+func AllRedirectHeader(target_url string) ([]string, error) {
 	req, _ := http.NewRequest("HEAD", target_url, nil)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -17,11 +18,15 @@ func AllRedirectHeader(target_url string) ([]string, error){
 	for i := 0; r != nil; i++ {
 		rv := reflect.ValueOf(r).Elem()
 		vv := rv.FieldByName("Request")
+		dump, err := httputil.DumpResponse(r, false)
+		if err != nil {
+			break
+		}
 		rp, ok := vv.Interface().(*http.Request)
 		if !ok {
 			break
 		}
-		a = append(a, rp.URL.String())
+		a = append(a, string(dump))
 		r = rp.Response
 	}
 	return a, err
