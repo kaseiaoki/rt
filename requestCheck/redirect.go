@@ -13,19 +13,23 @@ func AllRedirectHeader(target_url string) ([]string, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
+
 	var a []string
 	r := resp
 	for i := 0; r != nil; i++ {
 		rv := reflect.ValueOf(r).Elem()
 		vv := rv.FieldByName("Request")
-		dump, err := httputil.DumpResponse(r, false)
-		if err != nil {
-			break
-		}
+
 		rp, ok := vv.Interface().(*http.Request)
 		if !ok {
 			break
 		}
+
+		dump, err := httputil.DumpResponse(r, false)
+		if err != nil {
+			break
+		}
+		a = append(a, rp.URL.String())
 		a = append(a, string(dump))
 		r = rp.Response
 	}
