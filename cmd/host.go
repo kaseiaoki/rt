@@ -47,8 +47,8 @@ var hostCmd = &cobra.Command{
 			return nil
 		}
 		u := result
-		for i, _ := range u {
-			fmt.Printf("%d : %s\n", i, u[i])
+		for i, s := range u {
+			fmt.Printf("%d : %s\n", i, s)
 		}
 		return nil
 	},
