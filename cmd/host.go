@@ -18,9 +18,9 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"github.com/kaseiaoki/rt/requestCheck"
 	"github.com/spf13/cobra"
 	"net/url"
-	"github.com/kaseiaoki/rt/requestCheck"
 )
 
 var RedirectAttemptedError = errors.New("redirect")
@@ -41,7 +41,7 @@ var hostCmd = &cobra.Command{
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		result,err := requestCheck.AllRedirectHeader(args[0])
+		result, err := requestCheck.AllRedirectHeader(args[0])
 		if err != nil {
 			fmt.Println(err)
 			return nil
