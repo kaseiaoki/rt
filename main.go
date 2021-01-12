@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "github.com/aoki.kaisei/rt/cmd"
+import "github.com/kaseiaoki/rt/cmd"
 
 func main() {
 	cmd.Execute()

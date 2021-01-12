@@ -19,8 +19,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/spf13/cobra"
-	"net/http"
 	"net/url"
+	"github.com/kaseiaoki/rt/requestCheck"
 )
 
 var RedirectAttemptedError = errors.New("redirect")
@@ -34,7 +34,6 @@ var hostCmd = &cobra.Command{
 		if len(args) < 1 {
 			return errors.New("Default argument is url(https://example.io)")
 		}
-		// is url vaild
 		u, err := url.Parse(args[0])
 		if err != nil || u.Scheme == "" || u.Host == "" {
 			return errors.New("Default argument is url(https://example.io)")
@@ -42,13 +41,9 @@ var hostCmd = &cobra.Command{
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		target_url := args[0]
-		req, _ := http.NewRequest("HEAD", target_url, nil)
-		resp, _ := http.DefaultTransport.RoundTrip(req)
-		defer resp.Body.Close()
-		if resp.StatusCode == 301 || resp.StatusCode == 302 || resp.StatusCode == 303 || resp.StatusCode == 307 {
-			fmt.Println(resp.Header["Location"])
-		}
+		url := args[0]
+		result := requestCheck.AllRedirectHeader(url)
+		fmt.Println(result)
 		return nil
 	},
 }
