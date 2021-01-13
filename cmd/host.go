@@ -41,14 +41,10 @@ var hostCmd = &cobra.Command{
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		result, err := requestCheck.AllRedirectHeader(args[0])
+		_, err := requestCheck.AllRedirectHeader(args[0])
 		if err != nil {
 			fmt.Println(err)
 			return nil
-		}
-		u := result
-		for i := len(u) - 1; i >= 0; i-- {
-			fmt.Println(u[i])
 		}
 
 		return nil
