@@ -1,38 +1,47 @@
 package requestCheck
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httputil"
-	"reflect"
 )
 
+type dumpTransport struct {
+	transport http.RoundTripper
+}
+
+func (dt *dumpTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	resp, err := dt.transport.RoundTrip(req)
+	var dump []byte
+	dump, e := httputil.DumpResponse(resp, false)
+	if e != nil {
+		return resp, err
+	}
+
+	fmt.Printf("** %s **\n", req.URL.String())
+	fmt.Printf("%s", dump)
+
+	return resp, err
+}
+
+func (dt *dumpTransport) CancelRequest(req *http.Request) {
+	type canceler interface {
+		CancelRequest(*http.Request)
+	}
+	if cr, ok := dt.transport.(canceler); ok {
+		cr.CancelRequest(req)
+	}
+}
+
 func AllRedirectHeader(target_url string) ([]string, error) {
-	req, _ := http.NewRequest("HEAD", target_url, nil)
-	resp, err := http.DefaultClient.Do(req)
+	cli := http.DefaultClient
+	cli.Transport = &dumpTransport{http.DefaultTransport}
+
+	resp, err := cli.Head(target_url)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	var a []string
-	r := resp
-	for i := 0; r != nil; i++ {
-		rv := reflect.ValueOf(r).Elem()
-		vv := rv.FieldByName("Request")
-
-		rp, ok := vv.Interface().(*http.Request)
-		if !ok {
-			break
-		}
-
-		dump, err := httputil.DumpResponse(r, false)
-		if err != nil {
-			break
-		}
-		
-		nameAndHeader := rp.URL.String() + "\n" + string(dump)
-		a = append(a, nameAndHeader)
-		r = rp.Response
-	}
-	return a, err
+	return nil, nil
 }
