@@ -22,13 +22,16 @@ import (
 	"net"
 )
 
+var (
+	reverse bool
+)
+
 // lookupCmd represents the lookup command
 var lookupCmd = &cobra.Command{
 	Use:   "lookup",
 	Short: "lookup cmd",
 	Long:  `lookup cmd from host`,
 	Args: func(cmd *cobra.Command, args []string) error {
-
 		if len(args) < 1 {
 			return errors.New("Default argument is domain")
 		}
@@ -37,6 +40,18 @@ var lookupCmd = &cobra.Command{
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		addrs, err := net.LookupHost(args[0])
+
+		if reverse {
+			addr, err := net.LookupAddr(args[0])
+
+			if err != nil {
+				fmt.Println(err)
+				return nil
+			}
+			fmt.Println(addr)
+			return nil
+		}
+
 		if err != nil {
 			fmt.Println(err)
 			return nil
@@ -52,4 +67,15 @@ var lookupCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(lookupCmd)
+	rootCmd.PersistentFlags().BoolVar(&reverse, "r", false, "Reverse resolution")
+
+	// Here you will define your flags and configuration settings.
+
+	// Cobra supports Persistent Flags which will work for this command
+	// and all subcommands, e.g.:
+	// hCmd.PersistentFlags().String("foo", "", "A help for foo")
+
+	// Cobra supports local flags which will only run when this command
+	// is called directly, e.g.:
+	// hCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
